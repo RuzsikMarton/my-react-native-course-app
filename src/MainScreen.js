@@ -1,7 +1,8 @@
 import React from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View, Text, Pressable } from 'react-native';
 
-export default function MainScreen({ navigation }) {
+export default function MainScreen({ navigation, route}) {
+
     const onPressHandler = () => {
         navigation.navigate('Second')
     }
@@ -13,6 +14,7 @@ export default function MainScreen({ navigation }) {
                     Go to Second Screen
                 </Text>
             </Pressable>
+            <Text style={styles.text}>{route.params?.Message}</Text>
         </View>
     )
 }

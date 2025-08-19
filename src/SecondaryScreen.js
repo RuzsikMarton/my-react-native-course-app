@@ -1,9 +1,13 @@
 import React from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View, Text, Pressable } from 'react-native';
 
-export default function SecondScreen({ navigation }) {
+export default function SecondScreen({ navigation, route }) {
+  const {itemName, itemId} = route.params;
+
   const onPressHandler = () => {
-    navigation.goBack();
+    navigation.navigate('Home', {Message: 'message from Second Screen'});
+    //navigation.goBack();
+    navigation.setParams({itemId: 14});
   }
   return (
     <View style={styles.body}>
@@ -13,6 +17,8 @@ export default function SecondScreen({ navigation }) {
           Back to Home Screen
         </Text>
       </Pressable>
+      <Text style={styles.text}>{itemName}</Text>
+      <Text style={styles.text}>Id: {itemId}</Text>
     </View>
   )
 }
