@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar, StyleSheet, useColorScheme, View, Text, Pressable } from 'react-native';
-import MainScreen from './src/MainScreen'
-import SecondScreen from './src/SecondaryScreen'
+import MainScreen from './src/screens/MainScreen'
+import SecondScreen from './src/screens/SecondaryScreen'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View, Text, Pressable } from 'react-native';
+import GlobalStyle from '../utils/GlobalStyle'
 
 export default function MainScreen({ navigation, route}) {
 
@@ -8,9 +9,9 @@ export default function MainScreen({ navigation, route}) {
     }
     return (
         <View style={styles.body}>
-            <Text style={styles.text}>Hello World</Text>
+            <Text style={[styles.text, GlobalStyle.CustomFont]}>Hello World</Text>
             <Pressable onPress={onPressHandler} style={({ pressed }) => ({ backgroundColor: pressed ? '#ddd' : '#a00' })}>
-                <Text style={styles.text}>
+                <Text style={GlobalStyle.ButtonText}>
                     Go to Second Screen
                 </Text>
             </Pressable>
@@ -27,7 +28,6 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 40,
-        fontWeight: 'bold',
-        margin: 10
+        margin: 10,
     }
 })
