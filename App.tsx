@@ -1,23 +1,51 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar, StyleSheet, useColorScheme, View, Text, Pressable } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View} from 'react-native';
 import MainScreen from './src/screens/MainScreen'
 import SecondScreen from './src/screens/SecondaryScreen'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import FontAwesome6 from '@react-native-vector-icons/fontawesome6';
 
-const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name={'Home'} component={MainScreen}/>
-        <Tab.Screen name={'Second'} component={SecondScreen} initialParams={{itemName: 'Item from Tab', itemId: 12}} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar barStyle={'dark-content'}></StatusBar>
+      <NavigationContainer>
+        <Drawer.Navigator
+          screenOptions={{
+            drawerType: 'front',
+            drawerPosition: 'left',
+            swipeEdgeWidth: 100,
+            drawerStyle: {
+              backgroundColor: '#fff',
+              width: 250,
+            },
+            drawerActiveTintColor: '#C19A6B',
+            headerStyle: {
+              backgroundColor: '#C19A6B',
+            },
+            headerTitleStyle: {
+              fontSize: 25,
+              fontFamily: 'PlayfairDisplay-Regular',
+            }
+        }}
+        >
+          <Drawer.Screen 
+            name={'Home'} 
+            component={MainScreen} 
+            options={{title: 'Home', drawerIcon:({focused})=> (<FontAwesome6 name="house" iconStyle='solid' color={focused ? '#C19A6B' : '#444'}/>)}} />
+          <Drawer.Screen 
+            name={'Second'} 
+            component={SecondScreen} 
+            options={{title: 'Second Screen',drawerIcon:({focused})=> (<FontAwesome6 name="door-open" iconStyle='solid' color={focused ? '#C19A6B' : '#444'}/>)}} 
+            initialParams={{ itemName: 'Item from Tab', itemId: 12 }} />
+        </Drawer.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
 
