@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar, StyleSheet, useColorScheme, View} from 'react-native';
-import MainScreen from './src/screens/MainScreen'
-import SecondScreen from './src/screens/SecondaryScreen'
+import Home from './src/screens/Home'
+import Login from './src/screens/Login'
+import Profile from './src/screens/Profile'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import FontAwesome6 from '@react-native-vector-icons/fontawesome6';
 
@@ -16,6 +17,7 @@ function App() {
       <StatusBar barStyle={'dark-content'}></StatusBar>
       <NavigationContainer>
         <Drawer.Navigator
+          initialRouteName='Login'
           screenOptions={{
             drawerType: 'front',
             drawerPosition: 'left',
@@ -36,13 +38,19 @@ function App() {
         >
           <Drawer.Screen 
             name={'Home'} 
-            component={MainScreen} 
-            options={{title: 'Home', drawerIcon:({focused})=> (<FontAwesome6 name="house" iconStyle='solid' color={focused ? '#C19A6B' : '#444'}/>)}} />
+            component={Home} 
+            options={{title: 'Home',drawerIcon:({focused})=> (<FontAwesome6 name="house" iconStyle='solid' color={focused ? '#C19A6B' : '#444'} size={20}/>)}} 
+          />
           <Drawer.Screen 
-            name={'Second'} 
-            component={SecondScreen} 
-            options={{title: 'Second Screen',drawerIcon:({focused})=> (<FontAwesome6 name="door-open" iconStyle='solid' color={focused ? '#C19A6B' : '#444'}/>)}} 
-            initialParams={{ itemName: 'Item from Tab', itemId: 12 }} />
+            name={'Login'} 
+            component={Login} 
+            options={{title: 'Login',drawerIcon:({focused})=> (<FontAwesome6 name="clipboard-user" iconStyle='solid' color={focused ? '#C19A6B' : '#444'} size={20}/>)}} 
+          />
+          <Drawer.Screen 
+            name={'Profile'} 
+            component={Profile} 
+            options={{title: 'Profile', drawerIcon:({focused})=> (<FontAwesome6 name="user" iconStyle='solid' color={focused ? '#C19A6B' : '#444'} size={20}/>)}} 
+          />
         </Drawer.Navigator>
       </NavigationContainer>
     </>

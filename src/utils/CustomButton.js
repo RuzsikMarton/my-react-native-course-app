@@ -6,7 +6,7 @@ export const CustomButton = (props) => {
         <Pressable
             style={({ pressed }) => [
                 styles.button,
-                { backgroundColor: pressed ? '#a00' : props.color },
+                { backgroundColor: pressed ? '#E3BC8D' : props.color },
                 { ...props.style }
             ]}
             onPress={props.onPressFunction}

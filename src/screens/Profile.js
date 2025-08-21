@@ -1,36 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   Pressable,
-  Modal, Image,
+  Modal,
+  Alert,
 } from 'react-native';
-import { CustomButton } from './CustomButton';
-import { Header } from './Header';
+import { CustomButton } from '../utils/CustomButton';
+import GlobalStyle from '../utils/GlobalStyle';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HomeScreen = () => {
+export default function Profile({ navigation }) {
   const [name, setName] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [age, setAge] = useState(0);
   const [showWarning, setShowWarning] = useState(false);
-  const onPressHandler = () => {
-    if (submitted) {
-      // Clear
-      setSubmitted(false);
-      setName('');
+
+  useEffect(() => {
+    getData();
+  }, [])
+
+  const getData = async () => {
+    try {
+      await AsyncStorage.getItem('UserData')
+        .then(value => {
+          if (value != null) {
+            let user = JSON.parse(value);
+            setName(user.Name);
+            setAge(user.Age);
+          }
+        })
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const updateData = async () => {
+    if (name.length === 0) {
+      Alert.alert('Warning', 'Please enter your name.')
     } else {
-      if (name.length > 2) {
-        setSubmitted(true);
-      } else {
-        setShowWarning(true);
+      try {
+        let user = {
+          Name: name,
+          Age: age
+        }
+        await AsyncStorage.setItem('UserData', JSON.stringify(user));
+        setShowWarning(true)
+      } catch (e) {
+        console.log(e);
       }
     }
   };
 
+  const removeData = async () => {
+    try {
+      await AsyncStorage.removeItem('UserData');
+      setName('');
+      navigation.navigate('Login');
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return (
     <View style={styles.body}>
-      <Header/>
       <Modal
         visible={showWarning}
         transparent
@@ -41,11 +75,11 @@ const HomeScreen = () => {
         <View style={styles.centered_view}>
           <View style={styles.warning_modal}>
             <View style={styles.warning_title}>
-              <Text style={styles.text}>WARNING!</Text>
+              <Text style={[styles.text, GlobalStyle.CustomFont]}>Success!</Text>
             </View>
             <View style={styles.warning_body}>
               <Text style={styles.text}>
-                The name must be longar than 2 characters
+                your data has been updated.
               </Text>
             </View>
             <Pressable
@@ -62,7 +96,8 @@ const HomeScreen = () => {
           </View>
         </View>
       </Modal>
-      <Text style={styles.text}>Please write your name:</Text>
+      <Text style={[styles.text, GlobalStyle.CustomFont]}>Your profile: {name}</Text>
+      <Text style={[styles.text, GlobalStyle.CustomFont]}>Your age is: {age}</Text>
       <TextInput
         value={name}
         editable={true}
@@ -70,38 +105,12 @@ const HomeScreen = () => {
         keyboardType={'default'}
         multiline={false}
         style={styles.input}
-        placeholder={'e.g Marci'}
+        placeholder={'e.g Martin'}
         secureTextEntry={false}
         onChangeText={value => setName(value)}
       />
-      {/*<Pressable
-        style={({ pressed }) => [
-          styles.button,
-          { backgroundColor: pressed ? '#a00' : '#d00' },
-        ]}
-        onPress={onPressHandler}
-        hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
-      >
-        <Text style={styles.text}>{submitted ? 'Clear' : 'Submit'}</Text>
-      </Pressable>*/}
-      <CustomButton onPressFunction={onPressHandler} title={submitted ? 'Clear' : 'Submit'} color={'#d00'}/>
-      <CustomButton onPressFunction={() => {}} title={'Test'} color={'#070'} style={{margin:20}}/>
-      {submitted ? (
-        <View style={styles.body}>
-          <Text style={styles.text}>You are registered as {name}</Text>
-          <Image
-            source={require('../assets/done.png')}
-            style={styles.image}
-            resizeMode={'stretch'}
-          />
-        </View>
-      ) : (
-        <Image
-          source={require('../assets/error.png')}
-          style={styles.image}
-          resizeMode={'stretch'}
-        />
-      )}
+      <CustomButton onPressFunction={updateData} title={'Update'} color={'#C19A6B'} />
+      <CustomButton onPressFunction={removeData} title={'Remove'} color={'#A00'} />
     </View>
   );
 };
@@ -126,6 +135,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     marginBottom: 10,
+    marginTop: 20,
   },
   button: {
     width: 150,
@@ -155,7 +165,7 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'yellow',
+    backgroundColor: '#C19A6B',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
@@ -168,11 +178,4 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
-  image: {
-    width: '100',
-    height: '100',
-    margin: 10
-  }
 });
-
-export default HomeScreen;
