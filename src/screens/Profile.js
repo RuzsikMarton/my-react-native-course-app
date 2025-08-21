@@ -11,10 +11,20 @@ import {
 import { CustomButton } from '../utils/CustomButton';
 import GlobalStyle from '../utils/GlobalStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SQLite from "react-native-sqlite-storage"
+
+const db = SQLite.openDatabase(
+  {
+    name: 'MainDB',
+    location: 'default'
+  },
+  () => { },
+  error => { console.log(error) }
+)
 
 export default function Profile({ navigation }) {
   const [name, setName] = useState('');
-  const [age, setAge] = useState(0);
+  const [age, setAge] = useState('');
   const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
@@ -23,14 +33,29 @@ export default function Profile({ navigation }) {
 
   const getData = async () => {
     try {
-      await AsyncStorage.getItem('UserData')
-        .then(value => {
-          if (value != null) {
-            let user = JSON.parse(value);
-            setName(user.Name);
-            setAge(user.Age);
+      // await AsyncStorage.getItem('UserData')
+      //   .then(value => {
+      //     if (value != null) {
+      //       let user = JSON.parse(value);
+      //       setName(user.Name);
+      //       setAge(user.Age);
+      //     }
+      //   })
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT Name, AGE from Users",
+          [],
+          (tx, results) => {
+            var len = results.rows.length
+            if (len > 0) {
+              var userName = results.rows.item(0).Name;
+              var userAge = results.rows.item(0).Age;
+              setName(userName);
+              setAge(userAge);
+            }
           }
-        })
+        )
+      })
     } catch (e) {
       console.log(e);
     }
@@ -41,12 +66,19 @@ export default function Profile({ navigation }) {
       Alert.alert('Warning', 'Please enter your name.')
     } else {
       try {
-        let user = {
-          Name: name,
-          Age: age
-        }
-        await AsyncStorage.setItem('UserData', JSON.stringify(user));
-        setShowWarning(true)
+        // let user = {
+        //   Name: name,
+        //   Age: age
+        // }
+        // await AsyncStorage.setItem('UserData', JSON.stringify(user));
+        db.transaction((tx) => {
+          tx.executeSql(
+            "UPDATE Users SET Name=?",
+            [name],
+            () => { setShowWarning(true) },
+            error => { console.log(error) }
+          )
+        })
       } catch (e) {
         console.log(e);
       }
@@ -55,9 +87,19 @@ export default function Profile({ navigation }) {
 
   const removeData = async () => {
     try {
-      await AsyncStorage.removeItem('UserData');
-      setName('');
-      navigation.navigate('Login');
+      //await AsyncStorage.removeItem('UserData');
+      db.transaction((tx) => {
+        tx.executeSql(
+          "DELETE FROM Users",
+          [],
+          () => {
+            setName('');
+            setAge('');
+            navigation.navigate('Login');
+          },
+          error => { console.log(error) }
+        )
+      })
     } catch (e) {
       console.log(e);
     }

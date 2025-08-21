@@ -2,11 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View, Text, Pressable } from 'react-native';
 import GlobalStyle from '../utils/GlobalStyle'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SQLite from "react-native-sqlite-storage"
+
+const db = SQLite.openDatabase(
+    {
+        name: 'MainDB',
+        location: 'default'
+    },
+    () => { },
+    error => { console.log(error) }
+)
 
 export default function Home({ navigation, route }) {
 
     const [name, setName] = useState('');
-    const [age, setAge] = useState(0);
+    const [age, setAge] = useState('');
 
     useEffect(() => {
         getData();
@@ -14,14 +24,29 @@ export default function Home({ navigation, route }) {
 
     const getData = async () => {
         try {
-            await AsyncStorage.getItem('UserData')
-                .then(value => {
-                    if (value != null) {
-                        let user = JSON.parse(value);
-                        setName(user.Name);
-                        setAge(user.Age);
+            // await AsyncStorage.getItem('UserData')
+            //     .then(value => {
+            //         if (value != null) {
+            //             let user = JSON.parse(value);
+            //             setName(user.Name);
+            //             setAge(user.Age);
+            //         }
+            //     })
+            db.transaction((tx) => {
+                tx.executeSql(
+                    "SELECT Name, AGE from Users",
+                    [],
+                    (tx, results) => {
+                        var len = results.rows.length
+                        if(len>0){
+                            var userName = results.rows.item(0).Name;
+                            var userAge = results.rows.item(0).Age;
+                            setName(userName);
+                            setAge(userAge);
+                        }
                     }
-                })
+                )
+            })
         } catch (e) {
             console.log(e);
         }
@@ -34,7 +59,7 @@ export default function Home({ navigation, route }) {
         <View style={styles.body}>
             <Text style={[styles.text, GlobalStyle.CustomFont]}>Welcome {name}!</Text>
             {name != null
-                ? 
+                ?
                 <></>
                 :
                 <Pressable onPress={onPressHandler} style={({ pressed }) => ({ borderRadius: 15, backgroundColor: pressed ? '#E3BC8D' : '#C19A6B' })}>
@@ -42,7 +67,7 @@ export default function Home({ navigation, route }) {
                         Go to Registration Screen
                     </Text>
                 </Pressable>
-                }
+            }
             <Text style={styles.text}>{route.params?.Message}</Text>
         </View>
     )

@@ -4,22 +4,49 @@ import GlobalStyle from "../utils/GlobalStyle";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomButton } from "../utils/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import SQLite from "react-native-sqlite-storage"
+
+const db = SQLite.openDatabase(
+    {
+        name: 'MainDB',
+        location: 'default'
+    },
+    () => {},
+    error=>{console.log(error)}
+)
 
 export default function Login({navigation}) {
     const [name, setName] = useState('');
-    const [age, setAge] = useState(0);
+    const [age, setAge] = useState('');
 
     useEffect(()=> {
+        createTable();
         getData();
-    }, [])
+    }, []);
+
+    const createTable=() => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS "
+                +"Users"
+                +"(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Age INTEGER)"
+            )
+        })
+    }
 
     const getData = async () => {
         try{
-            await AsyncStorage.getItem('UserData')
-            .then(value=> {
-                if (value != null) {
-                    navigation.navigate('Home');
-                }
+           db.transaction((tx) => {
+                tx.executeSql(
+                    "SELECT Name, AGE from Users",
+                    [],
+                    (tx, results) => {
+                        var len = results.rows.length
+                        if(len>0){
+                           navigation.navigate('Home');
+                        }
+                    }
+                )
             })
         } catch(e){
             console.log(e);
@@ -27,14 +54,24 @@ export default function Login({navigation}) {
     }
 
     const onPressHandler = async () => {
-        if(name.length === 0 || age.length === 0) {
+        if(name.length == 0 || age.length == 0) {
             Alert.alert('Warning', 'Please enter your data.')
         }else {
             try{
-                let user = {
-                    Name: name,
-                }
-                await AsyncStorage.mergeItem('UserData', JSON.stringify(user));
+                // let user = {
+                //     Name: name,
+                //     Age: age,
+                // }
+                // await AsyncStorage.mergeItem('UserData', JSON.stringify(user));
+                await db.transaction(async (tx)=>{
+                    // await tx.executeSql(
+                    //     "INSERT INTO Users (Name, Age) VALUES ('"+name+"',"+age+")"
+                    // );
+                    await tx.executeSql(
+                        "INSERT INTO Users (Name, Age) VALUES (?,?)",
+                        [name, age]
+                    );
+                })
                 navigation.navigate('Home');
             } catch(e){
                 console.log(e);
