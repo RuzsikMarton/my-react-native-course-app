@@ -12,6 +12,8 @@ import { CustomButton } from '../utils/CustomButton';
 import GlobalStyle from '../utils/GlobalStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SQLite from "react-native-sqlite-storage"
+import { useDispatch, useSelector } from "react-redux";
+import { setName, setAge, increaseAge } from "../redux/slice";
 
 const db = SQLite.openDatabase(
   {
@@ -23,8 +25,11 @@ const db = SQLite.openDatabase(
 )
 
 export default function Profile({ navigation }) {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
+  const dispatch = useDispatch();
+  const { name, age} = useSelector(state => state.user);
+
+  // const [name, setName] = useState('');
+  // const [age, setAge] = useState('');
   const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
@@ -50,8 +55,8 @@ export default function Profile({ navigation }) {
             if (len > 0) {
               var userName = results.rows.item(0).Name;
               var userAge = results.rows.item(0).Age;
-              setName(userName);
-              setAge(userAge);
+              dispatch(setName(userName));
+              dispatch(setAge(userAge));
             }
           }
         )
@@ -149,10 +154,11 @@ export default function Profile({ navigation }) {
         style={styles.input}
         placeholder={'e.g Martin'}
         secureTextEntry={false}
-        onChangeText={value => setName(value)}
+        onChangeText={value => dispatch(setName(value))}
       />
       <CustomButton onPressFunction={updateData} title={'Update'} color={'#C19A6B'} />
       <CustomButton onPressFunction={removeData} title={'Remove'} color={'#A00'} />
+      <CustomButton onPressFunction={() => dispatch(increaseAge())} title={'Increase Age'} color={'#0080ff'} />
     </View>
   );
 };

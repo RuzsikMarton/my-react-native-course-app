@@ -6,6 +6,8 @@ import Login from './src/screens/Login'
 import Profile from './src/screens/Profile'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import FontAwesome6 from '@react-native-vector-icons/fontawesome6';
+import { Provider } from 'react-redux';
+import  store  from './src/redux/store'
 
 const Drawer = createDrawerNavigator();
 
@@ -13,7 +15,7 @@ function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <>
+    <Provider store={store}>
       <StatusBar barStyle={'dark-content'}></StatusBar>
       <NavigationContainer>
         <Drawer.Navigator
@@ -53,7 +55,7 @@ function App() {
           />
         </Drawer.Navigator>
       </NavigationContainer>
-    </>
+    </Provider>
   );
 }
 

@@ -5,6 +5,8 @@ import { TextInput } from "react-native-gesture-handler";
 import { CustomButton } from "../utils/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import SQLite from "react-native-sqlite-storage"
+import { useDispatch, useSelector } from "react-redux";
+import { setName, setAge } from "../redux/slice";
 
 const db = SQLite.openDatabase(
     {
@@ -16,8 +18,11 @@ const db = SQLite.openDatabase(
 )
 
 export default function Login({navigation}) {
-    const [name, setName] = useState('');
-    const [age, setAge] = useState('');
+    const dispatch = useDispatch();
+    const { name, age}=useSelector(state => state.user)
+
+    // const [name, setName] = useState('');
+    // const [age, setAge] = useState('');
 
     useEffect(()=> {
         createTable();
@@ -58,6 +63,8 @@ export default function Login({navigation}) {
             Alert.alert('Warning', 'Please enter your data.')
         }else {
             try{
+                dispatch(setName(name));
+                dispatch(setAge(age));
                 // let user = {
                 //     Name: name,
                 //     Age: age,
@@ -83,13 +90,13 @@ export default function Login({navigation}) {
         <View style={styles.body}>
             <Image 
                 style={styles.logo}
-                source={require('../../assets/asyncstorage.png')}
+                source={require('../../assets/redux.png')}
             />
             <Text style={[styles.text, GlobalStyle.ButtonText]}>
-                Async Storage
+                Redux
             </Text>
-            <TextInput style={styles.input} placeholder="Enter your name" onChangeText={(value) => setName(value)}/>
-            <TextInput style={styles.input} placeholder="Enter your age" onChangeText={(value) => setAge(value)}/>
+            <TextInput style={styles.input} placeholder="Enter your name" onChangeText={(value) => dispatch(setName(value))}/>
+            <TextInput style={styles.input} placeholder="Enter your age" onChangeText={(value) => dispatch(setAge(value))}/>
             <CustomButton title={'Login'} color={'#C19A6B'} onPressFunction={onPressHandler}></CustomButton>
         </View>
     )
