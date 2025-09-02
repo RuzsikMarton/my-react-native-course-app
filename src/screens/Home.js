@@ -4,7 +4,8 @@ import GlobalStyle from '../utils/GlobalStyle'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SQLite from "react-native-sqlite-storage"
 import { useDispatch, useSelector } from "react-redux";
-import { setName, setAge } from "../redux/slice";
+import { setName, setAge, getCities } from "../redux/slice";
+import { FlatList } from 'react-native-gesture-handler';
 
 const db = SQLite.openDatabase(
     {
@@ -17,14 +18,16 @@ const db = SQLite.openDatabase(
 
 export default function Home({ navigation, route }) {
     const dispatch = useDispatch();
-    const { name, age} = useSelector(state => state.user);
+    const { name, age, cities} = useSelector(state => state.user);
 
     // const [name, setName] = useState('');
     // const [age, setAge] = useState('');
 
     useEffect(() => {
         getData();
-    }, [])
+        dispatch(getCities());
+        console.log(cities)
+    }, [dispatch])
 
     const getData = async () => {
         try {
@@ -73,6 +76,12 @@ export default function Home({ navigation, route }) {
                 </Pressable>
             }
             <Text style={styles.text}>{route.params?.Message}</Text>
+            <FlatList data={cities} renderItem={({item}) => (
+                <View>
+                    <Text>{item.country}</Text>
+                    <Text>{item.city}</Text>
+                </View>
+            )}/>
         </View>
     )
 }
